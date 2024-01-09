@@ -64,9 +64,11 @@ if __name__ == '__main__':
 
     e = BacktraderEngine(benchmark='399006.SZ',start=datetime(2010, 6, 26), end=datetime(2020, 12, 31))
     for code in ['159915.SZ']:
-        e.add_arctic_data(code)
+        # e.add_arctic_data(code)
+        e.add_data(code)
 
     e.cerebro.addstrategy(StrategyBolling)
-    e.run()
+    # e.run()
+    e.run_algo_strategy([StrategyBolling])
     e.cerebro.plot(iplot=False)
     e.analysis()

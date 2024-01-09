@@ -1,4 +1,5 @@
-# encoding:utf8
+# -*- coding: utf-8 -*-
+
 import backtrader as bt
 from loguru import logger
 from engine.indicator.indicator_rsrs import RSRS

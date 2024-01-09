@@ -1,9 +1,10 @@
+# encoding:utf8
 import backtrader as bt
 
 
-# ×Ô¶¨ÒåĞÅºÅÖ¸±ê
+# è‡ªå®šä¹‰ä¿¡å·æŒ‡æ ‡
 class SignalTripleSMA(bt.Indicator):
-    lines = ('signal',)  # ÉùÃ÷ signal Ïß£¬½»Ò×ĞÅºÅ·ÅÔÚ signal line ÉÏ
+    lines = ('signal',)  # å£°æ˜ signal çº¿ï¼Œäº¤æ˜“ä¿¡å·æ”¾åœ¨ signal line ä¸Š
     params = dict(
         short_period=5,
         median_period=20,
@@ -14,11 +15,11 @@ class SignalTripleSMA(bt.Indicator):
         self.m_ma = bt.ind.SMA(period=self.p.median_period)
         self.l_ma = bt.ind.SMA(period=self.p.long_period)
 
-        # ¶ÌÆÚ¾ùÏßÔÚÖĞÆÚ¾ùÏßÉÏ·½£¬ÇÒÖĞÆÚ¾ùÏßÒ²ÔÚ³¤ÆÚ¾ùÏßÉÏ·½£¬ÈıÏß¶àÍ·ÅÅÁĞ£¬È¡ÖµÎª1£»·´Ö®£¬È¡ÖµÎª0
+        # çŸ­æœŸå‡çº¿åœ¨ä¸­æœŸå‡çº¿ä¸Šæ–¹ï¼Œä¸”ä¸­æœŸå‡çº¿ä¹Ÿåœ¨é•¿æœŸå‡çº¿ä¸Šæ–¹ï¼Œä¸‰çº¿å¤šå¤´æ’åˆ—ï¼Œå–å€¼ä¸º1ï¼›åä¹‹ï¼Œå–å€¼ä¸º0
         self.signal1 = bt.And(self.m_ma > self.l_ma, self.s_ma > self.m_ma)
-        # ÇóÉÏÃæ self.signal1 µÄ»·±ÈÔöÁ¿£¬¿ÉÒÔÅĞ¶ÏµÃµ½µÚÒ»´ÎÍ¬Ê±Âú×ãÉÏÊöÌõ¼şµÄÊ±¼ä£¬µÚÒ»´ÎÂú×ãÌõ¼şÎª1£¬ÆäÓàÌõ¼şÎª0
+        # æ±‚ä¸Šé¢ self.signal1 çš„ç¯æ¯”å¢é‡ï¼Œå¯ä»¥åˆ¤æ–­å¾—åˆ°ç¬¬ä¸€æ¬¡åŒæ—¶æ»¡è¶³ä¸Šè¿°æ¡ä»¶çš„æ—¶é—´ï¼Œç¬¬ä¸€æ¬¡æ»¡è¶³æ¡ä»¶ä¸º1ï¼Œå…¶ä½™æ¡ä»¶ä¸º0
         self.buy_signal = bt.If((self.signal1 - self.signal1(-1)) > 0, 1, 0)
-        # ¶ÌÆÚ¾ùÏßÏÂ´©³¤ÆÚ¾ùÏßÊ±£¬È¡ÖµÎª1£»·´Ö®È¡ÖµÎª0
+        # çŸ­æœŸå‡çº¿ä¸‹ç©¿é•¿æœŸå‡çº¿æ—¶ï¼Œå–å€¼ä¸º1ï¼›åä¹‹å–å€¼ä¸º0
         self.sell_signal = bt.ind.CrossDown(self.s_ma, self.m_ma)
-        # ½«ÂòÂôĞÅºÅºÏ²¢³ÉÒ»¸öĞÅºÅ
+        # å°†ä¹°å–ä¿¡å·åˆå¹¶æˆä¸€ä¸ªä¿¡å·
         self.lines.signal = bt.Sum(self.buy_signal, self.sell_signal * (-1))

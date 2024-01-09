@@ -1,9 +1,10 @@
+# encoding:utf8
 import backtrader as bt
 
 
-# ×Ô¶¨ÒåĞÅºÅÖ¸±ê
+# è‡ªå®šä¹‰ä¿¡å·æŒ‡æ ‡
 class SignalDoubleSMA(bt.Indicator):
-    lines = ('signal',)  # ÉùÃ÷ signal Ïß£¬½»Ò×ĞÅºÅ·ÅÔÚ signal line ÉÏ
+    lines = ('signal',)  # å£°æ˜ signal çº¿ï¼Œäº¤æ˜“ä¿¡å·æ”¾åœ¨ signal line ä¸Š
     params = dict(
         short_period=5,
         long_period=20)
@@ -11,5 +12,5 @@ class SignalDoubleSMA(bt.Indicator):
     def __init__(self):
         self.s_ma = bt.ind.SMA(period=self.p.short_period)
         self.l_ma = bt.ind.SMA(period=self.p.long_period)
-        # ¶ÌÆÚ¾ùÏßÉÏ´©³¤ÆÚ¾ùÏß£¬È¡ÖµÎª1£»·´Ö®£¬¶ÌÆÚ¾ùÏßÏÂ´©³¤ÆÚ¾ùÏß£¬È¡ÖµÎª-1
+        # çŸ­æœŸå‡çº¿ä¸Šç©¿é•¿æœŸå‡çº¿ï¼Œå–å€¼ä¸º1ï¼›åä¹‹ï¼ŒçŸ­æœŸå‡çº¿ä¸‹ç©¿é•¿æœŸå‡çº¿ï¼Œå–å€¼ä¸º-1
         self.lines.signal = bt.ind.CrossOver(self.s_ma, self.l_ma)

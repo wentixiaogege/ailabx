@@ -1,4 +1,5 @@
-# encoding: utf8
+# -*- coding: utf-8 -*-
+
 from loguru import logger
 import pandas as pd
 import abc
@@ -228,7 +229,7 @@ class WeightFix:
         return False
 
 
-from .algo_utils import *
+from engine.strategy.algo_utils import *
 
 
 class WeightRP:

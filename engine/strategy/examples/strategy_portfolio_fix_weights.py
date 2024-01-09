@@ -11,7 +11,8 @@ if __name__ == '__main__':
 
     e = BacktraderEngine(start=datetime(2016, 1, 1), end=datetime(2020, 12, 31))
     for code in codes:
-        e.add_arctic_data(code)
+        # e.add_arctic_data(code)
+        e.add_data(code)
 
     algos = [
         #RunOnce(),

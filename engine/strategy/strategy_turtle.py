@@ -1,79 +1,78 @@
+# -*- coding: utf-8 -*-
+
 import backtrader as bt
 from engine.strategy.strategy_base import StrategyBase
 
 
 class TurtleTradingStrategy(StrategyBase):
-    params = dict(
-        N1=20,  # ÌÆÆæ°²Í¨µÀÉÏ¹ìµÄt
-        N2=10,  # ÌÆÆæ°²Í¨µÀÏÂ¹ìµÄt
-    )
+    params = {'N1': 20, 'N2': 10}
 
     def __init__(self):
         self.order = None
-        self.buy_count = 0  # ¼ÇÂ¼ÂòÈë´ÎÊı
-        self.last_price = 0  # ¼ÇÂ¼ÂòÈë¼Û¸ñ
-        # ×¼±¸µÚÒ»¸ö±êµÄ»¦Éî300Ö÷Á¦ºÏÔ¼µÄclose¡¢high¡¢low ĞĞÇéÊı¾İ
+        self.buy_count = 0  # è®°å½•ä¹°å…¥æ¬¡æ•°
+        self.last_price = 0  # è®°å½•ä¹°å…¥ä»·æ ¼
+        # å‡†å¤‡ç¬¬ä¸€ä¸ªæ ‡çš„æ²ªæ·±300ä¸»åŠ›åˆçº¦çš„closeã€highã€low è¡Œæƒ…æ•°æ®
         self.close = self.datas[0].close
         self.high = self.datas[0].high
         self.low = self.datas[0].low
-        # ¼ÆËãÌÆÆæ°²Í¨µÀÉÏ¹ì£º¹ıÈ¥20ÈÕµÄ×î¸ß¼Û
+        # è®¡ç®—å”å¥‡å®‰é€šé“ä¸Šè½¨ï¼šè¿‡å»20æ—¥çš„æœ€é«˜ä»·
         self.DonchianH = bt.ind.Highest(self.high(-1), period=self.p.N1, subplot=True)
-        # ¼ÆËãÌÆÆæ°²Í¨µÀÏÂ¹ì£º¹ıÈ¥10ÈÕµÄ×îµÍ¼Û
+        # è®¡ç®—å”å¥‡å®‰é€šé“ä¸‹è½¨ï¼šè¿‡å»10æ—¥çš„æœ€ä½ä»·
         self.DonchianL = bt.ind.Lowest(self.low(-1), period=self.p.N2, subplot=True)
-        # Éú³ÉÌÆÆæ°²Í¨µÀÉÏ¹ìÍ»ÆÆ£ºclose>DonchianH£¬È¡ÖµÎª1.0£»·´Ö®Îª -1.0
+        # ç”Ÿæˆå”å¥‡å®‰é€šé“ä¸Šè½¨çªç ´ï¼šclose>DonchianHï¼Œå–å€¼ä¸º1.0ï¼›åä¹‹ä¸º -1.0
         self.CrossoverH = bt.ind.CrossOver(self.close(0), self.DonchianH, subplot=False)
-        # Éú³ÉÌÆÆæ°²Í¨µÀÏÂ¹ìÍ»ÆÆ:
+        # ç”Ÿæˆå”å¥‡å®‰é€šé“ä¸‹è½¨çªç ´:
         self.CrossoverL = bt.ind.CrossOver(self.close(0), self.DonchianL, subplot=False)
-        # ¼ÆËã ATR
-        self.TR = bt.ind.Max((self.high(0) - self.low(0)),  # µ±ÈÕ×î¸ß¼Û-µ±ÈÕ×îµÍ¼Û
-                             abs(self.high(0) - self.close(-1)),  # abs(µ±ÈÕ×î¸ß¼Û?Ç°Ò»ÈÕÊÕÅÌ¼Û)
-                             abs(self.low(0) - self.close(-1)))  # abs(µ±ÈÕ×îµÍ¼Û-Ç°Ò»ÈÕÊÕÅÌ¼Û)
+        # è®¡ç®— ATR
+        self.TR = bt.ind.Max((self.high(0) - self.low(0)),  # å½“æ—¥æœ€é«˜ä»·-å½“æ—¥æœ€ä½ä»·
+                             abs(self.high(0) - self.close(-1)),  # abs(å½“æ—¥æœ€é«˜ä»·?å‰ä¸€æ—¥æ”¶ç›˜ä»·)
+                             abs(self.low(0) - self.close(-1)))  # abs(å½“æ—¥æœ€ä½ä»·-å‰ä¸€æ—¥æ”¶ç›˜ä»·)
         self.ATR = bt.ind.SimpleMovingAverage(self.TR, period=self.p.N1, subplot=False)
-        # ¼ÆËã ATR£¬Ö±½Óµ÷ÓÃ talib £¬Ê¹ÓÃÇ°ĞèÒª°²×° python3 -m pip install TA-Lib
+        # è®¡ç®— ATRï¼Œç›´æ¥è°ƒç”¨ talib ï¼Œä½¿ç”¨å‰éœ€è¦å®‰è£… python3 -m pip install TA-Lib
         # self.ATR = bt.talib.ATR(self.high, self.low, self.close, timeperiod=self.p.N1, subplot=True)
 
     def next(self):
-        # Èç¹û»¹ÓĞ¶©µ¥ÔÚÖ´ĞĞÖĞ£¬¾Í²»×öĞÂµÄ²ÖÎ»µ÷Õû
+        # å¦‚æœè¿˜æœ‰è®¢å•åœ¨æ‰§è¡Œä¸­ï¼Œå°±ä¸åšæ–°çš„ä»“ä½è°ƒæ•´
         if self.order:
             return
 
-            # Èç¹ûµ±Ç°³ÖÓĞ¶àµ¥
+            # å¦‚æœå½“å‰æŒæœ‰å¤šå•
         if self.position.size > 0:
-            # ¶àµ¥¼Ó²Ö:¼Û¸ñÉÏÕÇÁËÂòÈë¼ÛµÄ0.5µÄATRÇÒ¼Ó²Ö´ÎÊıÉÙÓÚµÈÓÚ3´Î
+            # å¤šå•åŠ ä»“:ä»·æ ¼ä¸Šæ¶¨äº†ä¹°å…¥ä»·çš„0.5çš„ATRä¸”åŠ ä»“æ¬¡æ•°å°‘äºç­‰äº3æ¬¡
             if self.datas[0].close > self.last_price + 0.5 * self.ATR[0] and self.buy_count <= 4:
                 print('if self.datas[0].close >self.last_price + 0.5*self.ATR[0] and self.buy_count <= 4:')
                 print('self.buy_count', self.buy_count)
-                # ¼ÆËã½¨²Öµ¥Î»£ºself.ATR*ÆÚ»õºÏÔ¼³ËÊı300*±£Ö¤½ğ±ÈÀı0.1
+                # è®¡ç®—å»ºä»“å•ä½ï¼šself.ATR*æœŸè´§åˆçº¦ä¹˜æ•°300*ä¿è¯é‡‘æ¯”ä¾‹0.1
                 self.buy_unit = max((self.broker.getvalue() * 0.01) / self.ATR[0], 1)
-                self.buy_unit = int(self.buy_unit)  # ½»Ò×µ¥Î»ÎªÊÖ
+                self.buy_unit = int(self.buy_unit)  # äº¤æ˜“å•ä½ä¸ºæ‰‹
                 # self.sizer.p.stake = self.buy_unit
                 self.order = self.buy(size=self.buy_unit)
-                self.last_price = self.position.price  # »ñÈ¡ÂòÈë¼Û¸ñ
+                self.last_price = self.position.price  # è·å–ä¹°å…¥ä»·æ ¼
                 self.buy_count = self.buy_count + 1
-            # ¶àµ¥Ö¹Ëğ£ºµ±¼Û¸ñ»ØÂä2±¶ATRÊ±Ö¹ËğÆ½²Ö
+            # å¤šå•æ­¢æŸï¼šå½“ä»·æ ¼å›è½2å€ATRæ—¶æ­¢æŸå¹³ä»“
             elif self.datas[0].close < (self.last_price - 2 * self.ATR[0]):
                 print('elif self.datas[0].close < (self.last_price - 2*self.ATR[0]):')
                 self.order = self.sell(size=abs(self.position.size))
                 self.buy_count = 0
-            # ¶àµ¥Ö¹Ó¯£ºµ±¼Û¸ñÍ»ÆÆ10ÈÕ×îµÍµãÊ±Ö¹Ó¯Àë³¡ Æ½²Ö
+            # å¤šå•æ­¢ç›ˆï¼šå½“ä»·æ ¼çªç ´10æ—¥æœ€ä½ç‚¹æ—¶æ­¢ç›ˆç¦»åœº å¹³ä»“
             elif self.CrossoverL < 0:
                 print('self.CrossoverL < 0')
                 self.order = self.sell(size=abs(self.position.size))
                 self.buy_count = 0
 
-                # Èç¹ûµ±Ç°³ÖÓĞ¿Õµ¥
+                # å¦‚æœå½“å‰æŒæœ‰ç©ºå•
 
-        else:  # Èç¹ûÃ»ÓĞ³Ö²Ö£¬µÈ´ıÈë³¡Ê±»ú
-            # Èë³¡: ¼Û¸ñÍ»ÆÆÉÏ¹ìÏßÇÒ¿Õ²ÖÊ±£¬×ö¶à
+        else:  # å¦‚æœæ²¡æœ‰æŒä»“ï¼Œç­‰å¾…å…¥åœºæ—¶æœº
+            # å…¥åœº: ä»·æ ¼çªç ´ä¸Šè½¨çº¿ä¸”ç©ºä»“æ—¶ï¼Œåšå¤š
             if self.CrossoverH > 0 and self.buy_count == 0:
                 print('if self.CrossoverH > 0 and self.buy_count == 0:')
-                # ¼ÆËã½¨²Öµ¥Î»£ºself.ATR*ÆÚ»õºÏÔ¼³ËÊı300*±£Ö¤½ğ±ÈÀı0.1
+                # è®¡ç®—å»ºä»“å•ä½ï¼šself.ATR*æœŸè´§åˆçº¦ä¹˜æ•°300*ä¿è¯é‡‘æ¯”ä¾‹0.1
                 self.buy_unit = max((self.broker.getvalue() * 0.01) / self.ATR[0], 1)
-                self.buy_unit = int(self.buy_unit)  # ½»Ò×µ¥Î»ÎªÊÖ
+                self.buy_unit = int(self.buy_unit)  # äº¤æ˜“å•ä½ä¸ºæ‰‹
                 self.order = self.buy(size=self.buy_unit)
-                self.last_price = self.position.price  # ¼ÇÂ¼ÂòÈë¼Û¸ñ
-                self.buy_count = 1  # ¼ÇÂ¼±¾´Î½»Ò×¼Û¸ñ
-            # Èë³¡: ¼Û¸ñµøÆÆÏÂ¹ìÏßÇÒ¿Õ²ÖÊ±
+                self.last_price = self.position.price  # è®°å½•ä¹°å…¥ä»·æ ¼
+                self.buy_count = 1  # è®°å½•æœ¬æ¬¡äº¤æ˜“ä»·æ ¼
+            # å…¥åœº: ä»·æ ¼è·Œç ´ä¸‹è½¨çº¿ä¸”ç©ºä»“æ—¶
             elif self.CrossoverL < 0 and self.buy_count == 0:
                 print('self.CrossoverL < 0 and self.buy_count == 0')
 

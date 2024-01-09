@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 import backtrader as bt
-from .algos import *
+from engine.strategy.algos import *
 from loguru import logger
 
 from .strategy_base import StrategyBase

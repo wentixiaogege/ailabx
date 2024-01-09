@@ -45,7 +45,7 @@ class BacktraderEngine:
         self.features = self.loader.data
 
     def add_model(self, model, split_date, feature_names):
-        self.dataset = Dataset(dataloader=self.loader, split_date=split_date, feature_names=feature_names)
+        self.dataset = Dataset(dataloader=self.loader, split_date=split_date, feature_names=feature_names,label_name='return')
         model.fit(self.dataset)
         self.features['pred_score'] = model.predict(self.dataset)
         print(self.features['pred_score'])

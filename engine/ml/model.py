@@ -26,7 +26,8 @@ class SklearnModel(Model):
         y_pred = self.clf.predict(X)
         return y_pred
 
-
+from engine.datafeed.dataloader import Dataloader
+from sklearn.ensemble import RandomForestRegressor
 if __name__ == '__main__':
     names = []
     fields = []
@@ -59,16 +60,14 @@ if __name__ == '__main__':
     fields += ["Ref($close,-1)/$close - 1"]
     names += ['label']
 
-    from engine.datafeed.dataloader import Dataloader
 
-    loader = Dataloader()
-    loader.load_one_df(['000300.SH', 'SPX'], names, fields)
+    loader = Dataloader(['000300.SH', 'SPX'], names, fields)
+    loader.load_one_df()
 
     ds = Dataset(dataloader=loader, feature_names=feature_names, split_date='2020-01-01')
     X, y = ds.get_test_data()
     print(X, y)
 
-    from sklearn.ensemble import RandomForestRegressor
 
     model = SklearnModel(RandomForestRegressor())
     model.fit(ds)
